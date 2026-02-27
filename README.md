@@ -1,123 +1,277 @@
-# 🌿 GreenBharat AI — Real-Time Environmental Intelligence System
+GreenBharat AI
 
-A real-time air quality monitoring and AI-powered sustainability advisor for Indian cities, built with the **Pathway** framework for **Hack For Green Bharat 2026**.
+Real-Time Environmental Intelligence System
 
-## 🎯 What It Does
 
-- **Live AQI Monitoring** — Tracks air quality across 8 Indian cities (Delhi, Mumbai, Bangalore, Chennai, Kolkata, Hyderabad, Pune, Jaipur) with real-time updates
-- **Anomaly Detection** — Auto-detects pollution spikes (PM2.5 > 60, AQI > 200) and issues CRITICAL/WARNING alerts
-- **AI Environmental Advisor** — RAG-powered chat that answers questions about air quality, sustainability, and India's climate using a curated knowledge base
-- **Live Dashboard** — Premium dark-themed dashboard with gauges, charts, alert feed, and AI chat — all auto-updating every 3 seconds
 
-## 🏗️ Architecture
 
-```
-┌─────────────────┐    ┌──────────────────┐    ┌──────────────┐    ┌───────────┐
-│ Data Simulator   │───▶│ Pathway Pipeline  │───▶│ REST API     │───▶│ Dashboard │
-│ (data_simulator) │    │ (pipeline.py)     │    │ (api_server) │    │ (frontend)│
-│ Simulated IoT    │    │ Stream Processing │    │ Flask Server │    │ HTML/JS   │
-│ sensor data      │    │ AQI + Anomalies   │    │              │    │ Chart.js  │
-└─────────────────┘    └──────────────────┘    └──────┬───────┘    └───────────┘
-                                                       │
-┌─────────────────┐                           ┌──────▼───────┐
-│ Knowledge Base   │──────────────────────────▶│ RAG Server   │
-│ (knowledge/*.md) │   Auto-indexes on change  │ (rag_server) │
-│ AQI, Climate,    │                           │ Pathway LLM  │
-│ Sustainability   │                           └──────────────┘
-└─────────────────┘
-```
 
-## 🔧 Pathway Usage
 
-| Feature | Pathway Component | Purpose |
-|---------|-------------------|---------|
-| Live Data Ingestion | `pw.io.csv.read()` | Watches `./data/` for new sensor data |
-| Stream Processing | `.filter()`, `.groupby().reduce()` | Real-time AQI aggregation & anomaly detection |
-| Output Streaming | `pw.io.jsonlines.write()` | Writes processed results as JSONL |
-| Live RAG Index | `DocumentStore` + `BruteForceKnnFactory` | Auto-updating vector index for Q&A |
-| Knowledge Server | `DocumentStoreServer` | Serves RAG queries via HTTP |
 
-**One-line rule compliance**: ✅ The system automatically updates when new data arrives — Pathway's reactive engine ensures all outputs reflect the latest data.
 
-## 📦 Setup & Run
+GreenBharat AI is a stream-driven environmental monitoring platform that combines real-time AQI processing, anomaly detection, and AI-powered sustainability guidance for Indian cities.
 
-### Prerequisites
-- Python 3.10+
-- Linux/WSL (Pathway requires Linux)
+Built using the Pathway reactive streaming framework for Hack For Green Bharat 2026.
 
-### Install
-```bash
-cd hackforgreen
-pip install -r requirements.txt
-```
+Overview
 
-### Run (3 terminals)
+Most air quality platforms display static AQI values and historical charts. They do not:
 
-**Terminal 1** — Start the data simulator:
-```bash
-python data_simulator.py
-```
+Detect abnormal pollution spikes in real time
 
-**Terminal 2** — Start the Pathway pipeline:
-```bash
-python pipeline.py
-```
+Provide contextual environmental explanations
 
-**Terminal 3** — Start the API + Dashboard:
-```bash
-python api_server.py
-```
+Offer interactive sustainability guidance
 
-Open **http://localhost:5000** in your browser.
+React automatically to knowledge updates
 
-### Optional: RAG Server (Terminal 4)
-```bash
-# Set your OpenAI key first
-export OPENAI_API_KEY=your_key_here
-python rag_server.py
-```
+GreenBharat AI integrates streaming analytics and retrieval-augmented AI into a unified environmental intelligence system.
 
-> Without an API key, the RAG server runs in fallback mode with keyword matching.
+Key Features
+Real-Time AQI Monitoring
 
-## 📁 Project Structure
+Simulated IoT data ingestion
 
-```
+Continuous stream processing
+
+Aggregated AQI and PM2.5 metrics
+
+Reactive dashboard updates
+
+Anomaly Detection
+
+Rule-based spike detection:
+
+PM2.5 > 60 → WARNING
+
+AQI > 200 → CRITICAL
+
+Live alert feed integration
+
+AI Environmental Advisor
+
+Retrieval-Augmented Generation (RAG)
+
+Auto-indexing markdown knowledge base
+
+Natural language Q&A
+
+Climate and sustainability guidance grounded in curated documents
+
+Interactive Dashboard
+
+Real-time gauges and trend charts
+
+Alert stream
+
+Integrated AI chat interface
+
+Automatic refresh without manual reload
+
+Supported Cities
+
+Delhi
+
+Mumbai
+
+Bangalore
+
+Chennai
+
+Kolkata
+
+Hyderabad
+
+Pune
+
+Jaipur
+
+The architecture is city-agnostic and extensible.
+
+Architecture
+System Flow
+Data Simulator
+    ↓
+Pathway Streaming Pipeline
+    ↓
+JSONL Output Stream
+    ↓
+REST API (Flask)
+    ↓
+Web Dashboard
+
+Knowledge Base (Markdown)
+    ↓
+Pathway DocumentStore
+    ↓
+RAG Server
+    ↓
+Chat Interface
+
+Technology Stack
+
+Streaming Engine
+
+Pathway
+
+Backend
+
+Python 3.10+
+
+Flask
+
+Frontend
+
+HTML
+
+CSS
+
+JavaScript
+
+Chart.js
+
+AI / RAG
+
+Pathway DocumentStore
+
+BruteForceKnnFactory
+
+OpenAI API (optional)
+
+Data Format
+
+CSV ingestion
+
+JSONL streaming output
+
+Repository Structure
 hackforgreen/
-├── data/                     # Live data directory (Pathway watches this)
-├── knowledge/                # RAG knowledge base
-│   ├── air_quality_guidelines.md
-│   ├── sustainability_tips.md
-│   └── climate_india.md
-├── output/                   # Pathway JSONL outputs (auto-generated)
-├── data_simulator.py         # Simulates live sensor data
-├── pipeline.py               # Pathway streaming pipeline
-├── rag_server.py             # RAG Q&A server
-├── api_server.py             # REST API + frontend server
+│
+├── data/                  # Live data directory
+├── knowledge/             # Markdown knowledge base
+├── output/                # Streamed JSONL output
+│
+├── src/
+│   ├── backend/
+│   ├── pipeline/
+│   └── simulator/
+│
 ├── frontend/
-│   ├── index.html            # Dashboard UI
-│   ├── style.css             # Dark glassmorphism theme
-│   └── app.js                # Real-time charts & data fetching
 ├── requirements.txt
-├── .env.example
 └── README.md
-```
+Quick Start
+Requirements
 
-## 🛤️ Tracks
+Python 3.10+
 
-- ✅ **Sustainability** — real-time environmental monitoring, green recommendations
-- ✅ **Climate & Environment** — pollution tracking, AQI analysis, weather data
-- ✅ **AI / Machine Learning** — RAG pipeline, real-time streaming ML
+Linux or WSL (Pathway requires Linux runtime)
 
-## 🏆 Key Features
+1. Clone Repository
+git clone https://github.com/VASAN-M/HACK_FOR_GREEN.git
+cd HACK_FOR_GREEN
+2. Create Virtual Environment
 
-1. **Real-time streaming** — Data updates every 4 seconds, dashboard refreshes every 3 seconds
-2. **Pathway-native** — Uses Pathway for both stream processing AND RAG indexing
-3. **Auto-updating** — Add/modify knowledge docs → RAG answers adapt instantly
-4. **8 city coverage** — Delhi, Mumbai, Bangalore, Chennai, Kolkata, Hyderabad, Pune, Jaipur
-5. **Anomaly detection** — Automated pollution spike alerts with severity levels
-6. **AI chat** — Ask questions about air quality, sustainability, and climate in natural language
+Linux / WSL:
 
----
+python3 -m venv venv
+source venv/bin/activate
+3. Install Dependencies
+pip install -r requirements.txt
+4. Run the System
 
-**Built for Hack For Green Bharat 2026 🇮🇳**
-**Powered by Pathway Real-Time Framework**
+Open three terminals.
+
+Terminal 1 — Data Simulator
+
+python -m src.simulator.data_simulator
+
+Terminal 2 — Pathway Pipeline
+
+python -m src.pipeline.pipeline
+
+Terminal 3 — API Server
+
+python -m src.backend.api_server
+
+Access the dashboard at:
+
+http://localhost:5000
+Optional: Enable AI Chat (RAG Mode)
+
+Set your OpenAI API key:
+
+export OPENAI_API_KEY=your_key_here
+python -m src.backend.rag_server
+
+If no API key is provided, fallback keyword mode is used.
+
+Design Principles
+
+Streaming-first architecture
+
+Modular service separation
+
+Deterministic anomaly detection
+
+Auto-updating knowledge index
+
+Clear data contracts via JSONL
+
+Limitations
+
+Uses simulated IoT data
+
+Threshold-based anomaly detection
+
+No distributed scaling
+
+No authentication layer
+
+No persistent time-series storage
+
+Future Improvements
+
+Adaptive anomaly detection using rolling statistics
+
+Predictive AQI forecasting
+
+Cloud-native deployment
+
+Distributed stream partitioning
+
+Role-based access control
+
+Persistent storage integration
+
+Contributing
+
+Contributions are welcome.
+
+Fork the repository
+
+Create a feature branch
+
+Commit changes
+
+Submit a pull request
+
+Before submitting:
+
+Ensure code runs in Linux/WSL
+
+Follow modular structure inside src/
+
+Keep changes focused and documented
+
+License
+
+This project is licensed under the MIT License.
+
+Create a LICENSE file in the root with:
+
+MIT License
+
+Copyright (c) 2026 Vasanth
+Acknowledgment
+
+Built for Hack For Green Bharat 2026 using the Pathway real-time framework.
