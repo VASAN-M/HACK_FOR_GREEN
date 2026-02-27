@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenBharat AI — Real-Time Environmental Intelligence</title>
+    <meta name="description"
+        content="Real-time air quality monitoring and AI-powered sustainability advisor for Indian cities">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/frontend/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <!-- Ambient Background -->
+    <div class="ambient-bg">
+        <div class="ambient-orb orb-1"></div>
+        <div class="ambient-orb orb-2"></div>
+        <div class="ambient-orb orb-3"></div>
+    </div>
+
+    <!-- Navigation Overlay -->
+    <div class="nav-overlay" id="navOverlay" onclick="closeNav()"></div>
+    <nav class="slide-nav" id="slideNav">
+        <div class="nav-header">
+            <h3>Navigation</h3>
+            <button class="nav-close" onclick="closeNav()">✕</button>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#summary" onclick="closeNav()">📊 Dashboard Overview</a></li>
+            <li><a href="#mapSection" onclick="closeNav()">🗺️ India Map</a></li>
+            <li><a href="#citySection" onclick="closeNav()">🏙️ City AQI Cards</a></li>
+            <li><a href="#healthSection" onclick="closeNav()">🏥 Health Advisory</a></li>
+            <li><a href="#chartsSection1" onclick="closeNav()">📈 AQI Charts</a></li>
+            <li><a href="#chartsSection2" onclick="closeNav()">🌡️ Weather Data</a></li>
+            <li><a href="#chartsSection3" onclick="closeNav()">📊 Advanced Analytics</a></li>
+            <li><a href="#alertSection" onclick="closeNav()">🚨 Alerts & AI Chat</a></li>
+            <li><a href="#sustainSection" onclick="closeNav()">🌿 Sustainability</a></li>
+        </ul>
+        <div class="nav-footer">
+            <div class="nav-badge">Powered by Pathway</div>
+        </div>
+    </nav>
+
+    <!-- City Detail Modal -->
+    <div class="modal-overlay" id="cityModal" onclick="closeCityModal(event)">
+        <div class="modal-content" id="cityModalContent">
+            <button class="modal-close" onclick="closeCityModal()">&times;</button>
+            <div id="cityModalBody"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleNav()" id="menuBtn">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" stroke="url(#grad)" stroke-width="2.5" fill="none" />
+                        <path d="M16 6 C12 12, 8 16, 16 26 C24 16, 20 12, 16 6Z" fill="url(#grad)" />
+                        <defs>
+                            <linearGradient id="grad" x1="0" y1="0" x2="32" y2="32">
+                                <stop offset="0%" stop-color="#34d399" />
+                                <stop offset="100%" stop-color="#06b6d4" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div>
+                    <h1>GreenBharat AI</h1>
+                    <p class="subtitle">Real-Time Environmental Intelligence</p>
+                </div>
+            </div>
+        </div>
+        <div class="header-center">
+            <div class="header-tabs">
+                <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+                <button class="tab-btn" onclick="switchTab('analytics')">Analytics</button>
+                <button class="tab-btn" onclick="switchTab('insights')">AI Insights</button>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="pathway-badge">
+                <span class="pw-dot"></span>
+                <span>PATHWAY</span>
+            </div>
+            <div class="status-badge" id="statusBadge">
+                <span class="status-dot"></span>
+                <span>LIVE</span>
+            </div>
+            <div class="last-update" id="lastUpdate">Connecting...</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard">
+
+        <!-- Summary Strip -->
+        <section class="summary-strip" id="summary">
+            <div class="summary-card">
+                <div class="summary-icon">🏙️</div>
+                <div class="summary-body">
+                    <div class="summary-label">Monitoring</div>
+                    <div class="summary-value" id="totalCities">—</div>
+                    <div class="summary-unit">cities</div>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">📊</div>
+                <div class="summary-body">
+                    <div class="summary-label">Avg AQI</div>
+                    <div class="summary-value" id="avgAqi">—</div>
+                    <div class="summary-unit" id="avgAqiCategory">—</div>
+                </div>
+            </div>
+            <div class="summary-card highlight-red">
+                <div class="summary-icon">⚠️</div>
+                <div class="summary-body">
+                    <div class="summary-label">Worst City</div>
+                    <div class="summary-value" id="worstCity">—</div>
+                    <div class="summary-unit" id="worstAqi">—</div>
+                </div>
+            </div>
+            <div class="summary-card highlight-green">
+                <div class="summary-icon">✅</div>
+                <div class="summary-body">
+                    <div class="summary-label">Best City</div>
+                    <div class="summary-value" id="bestCity">—</div>
+                    <div class="summary-unit" id="bestAqi">—</div>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">⚡</div>
+                <div class="summary-body">
+                    <div class="summary-label">Data Points</div>
+                    <div class="summary-value" id="totalReadings">—</div>
+                    <div class="summary-unit">processed</div>
+                </div>
+            </div>
+            <div class="summary-card highlight-warn">
+                <div class="summary-icon">🚨</div>
+                <div class="summary-body">
+                    <div class="summary-label">Alerts Active</div>
+                    <div class="summary-value" id="alertCount">—</div>
+                    <div class="summary-unit">cities &gt;200</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- India Map Section -->
+        <section class="section map-section" id="mapSection">
+            <div class="section-header">
+                <h2>🗺️ India Air Quality Map</h2>
+                <span class="section-tag">Interactive</span>
+            </div>
+            <div class="india-map-container">
+                <svg viewBox="60 130 580 580" class="india-map" id="indiaMap">
+                    <!-- Simplified India outline -->
+                    <path class="india-outline"
+                        d="M280,160 L320,155 L360,165 L400,170 L430,180 L460,200 L480,230 L500,260 L520,280 L540,300 L550,330 L555,360 L550,400 L540,430 L530,460 L510,490 L490,520 L460,550 L430,570 L400,590 L380,610 L360,630 L340,650 L320,660 L300,670 L280,680 L260,670 L240,650 L220,630 L200,600 L185,570 L175,540 L170,510 L168,480 L170,450 L175,420 L180,390 L190,360 L200,330 L210,300 L220,270 L230,250 L240,230 L250,210 L260,190 L270,170 Z"
+                        fill="rgba(52,211,153,0.05)" stroke="rgba(52,211,153,0.2)" stroke-width="1.5" />
+
+                    <!-- City markers will be placed by JS -->
+                    <!-- Delhi -->
+                    <g class="city-marker" id="marker-Delhi" data-city="Delhi" onclick="showCityDetail('Delhi')">
+                        <circle cx="310" cy="230" r="0" class="marker-pulse" fill="none" />
+                        <circle cx="310" cy="230" r="8" class="marker-dot" />
+                        <text x="310" y="215" class="marker-label">Delhi</text>
+                    </g>
+                    <!-- Jaipur -->
+                    <g class="city-marker" id="marker-Jaipur" data-city="Jaipur" onclick="showCityDetail('Jaipur')">
+                        <circle cx="280" cy="260" r="0" class="marker-pulse" fill="none" />
+                        <circle cx="280" cy="260" r="8" class="marker-dot" />
+                        <text x="280" y="245" class="marker-label">Jaipur</text>
+                    </g>
+                    <!-- Kolkata -->
+                    <g class="city-marker" id="marker-Kolkata" data-city="Kolkata" onclick="showCityDetail('Kolkata')">
+                        <circle cx="460" cy="310" r="0" class="marker-pulse" fill="none" />
+                        <circle cx="460" cy="310" r="8" class="marker-dot" />
+                        <text x="460" y="295" class="marker-label">Kolkata</text>
+                    </g>
+                    <!-- Mumbai -->
+                    <g class="city-marker" id="marker-Mumbai" data-city="Mumbai" onclick="showCityDetail('Mumbai')">
+                        <circle cx="220" cy="420" r="0" class="marker-pulse" fill="none" />
+                        <circle cx="220" cy="420" r="8" class="marker-dot" />
+                        <text x="220" y="405" class="marker-label">Mumbai</text>
+                    </g>
+                    <!-- Pune -->
+                    <g class="city-marker" id="marker-Pune" data-city="Pune" onclick="showCityDetail('Pune')">
+                        <circle cx="245" cy="445" r="0" class="marker-pulse" fill="none" />
+                        <circle cx="245" cy="445" r="8" class="marker-dot" />
+                        <text x="245" y="463" class="marker-label">Pune</text>
+                    </g>
+                    <!-- Hyderabad -->
+                    <g class="city-marker" id="marker-Hyderabad" data-city="Hyderabad"
+                        onclick="showCityDetail('Hyderabad')">
+                        <circle cx="310" cy="450" r="0" class="marker-pulse" fill="none" />
+                        <circle cx="310" cy="450" r="8" class="marker-dot" />
+                        <text x="310" y="468" class="marker-label">Hyderabad</text>
+                    </g>
+                    <!-- Bangalore -->
+                    <g class="city-marker" id="marker-Bangalore" data-city="Bangalore"
+                        onclick="showCityDetail('Bangalore')">
+                        <circle cx="280" cy="530" r="0" class="marker-pulse" fill="none" />
+                        <circle cx="280" cy="530" r="8" class="marker-dot" />
+                        <text x="280" y="548" class="marker-label">Bangalore</text>
+                    </g>
+                    <!-- Chennai -->
+                    <g class="city-marker" id="marker-Chennai" data-city="Chennai" onclick="showCityDetail('Chennai')">
+                        <circle cx="350" cy="510" r="0" class="marker-pulse" fill="none" />
+                        <circle cx="350" cy="510" r="8" class="marker-dot" />
+                        <text x="350" y="528" class="marker-label">Chennai</text>
+                    </g>
+                </svg>
+                <!-- Map Legend -->
+                <div class="map-legend">
+                    <div class="legend-title">AQI Level</div>
+                    <div class="legend-items">
+                        <div class="legend-item"><span class="legend-dot" style="background:#34d399"></span>Good (0-50)
+                        </div>
+                        <div class="legend-item"><span class="legend-dot" style="background:#fbbf24"></span>Satisfactory
+                            (51-100)</div>
+                        <div class="legend-item"><span class="legend-dot" style="background:#f97316"></span>Moderate
+                            (101-200)</div>
+                        <div class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>Poor
+                            (201-300)</div>
+                        <div class="legend-item"><span class="legend-dot" style="background:#a855f7"></span>Very Poor
+                            (301-400)</div>
+                        <div class="legend-item"><span class="legend-dot" style="background:#7c3aed"></span>Severe
+                            (401+)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- City AQI Cards Grid -->
+        <section class="section" id="citySection">
+            <div class="section-header">
+                <h2>🏙️ City Air Quality Index</h2>
+                <span class="section-tag">Live Monitoring — Click for Details</span>
+            </div>
+            <div class="city-grid" id="cityGrid">
+                <div class="loading-placeholder">Waiting for data...</div>
+            </div>
+        </section>
+
+        <!-- Health Advisory Panel -->
+        <section class="section health-section" id="healthSection">
+            <div class="section-header">
+                <h2>🏥 Real-Time Health Advisory</h2>
+                <span class="section-tag">Dynamic</span>
+            </div>
+            <div class="health-grid" id="healthGrid">
+                <div class="loading-placeholder">Analyzing air quality data...</div>
+            </div>
+        </section>
+
+        <!-- Charts Row 1 -->
+        <section class="charts-row" id="chartsSection1">
+            <div class="chart-panel">
+                <div class="section-header">
+                    <h2>📊 City AQI Comparison</h2>
+                    <span class="section-tag">Bar Chart</span>
+                </div>
+                <div class="chart-container chart-lg">
+                    <canvas id="aqiBarChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-panel">
+                <div class="section-header">
+                    <h2>📈 PM2.5 Trends</h2>
+                    <span class="section-tag">Line Chart</span>
+                </div>
+                <div class="chart-container chart-lg">
+                    <canvas id="pm25LineChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Row 2 -->
+        <section class="charts-row" id="chartsSection2">
+            <div class="chart-panel">
+                <div class="section-header">
+                    <h2>🌡️ Temperature & Humidity</h2>
+                    <span class="section-tag">Multi-Axis</span>
+                </div>
+                <div class="chart-container chart-lg">
+                    <canvas id="weatherChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-panel">
+                <div class="section-header">
+                    <h2>🧪 Pollutant Breakdown</h2>
+                    <span class="section-tag">Latest Average</span>
+                </div>
+                <div class="chart-container chart-lg donut-container">
+                    <canvas id="pollutantDonut"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Row 3 — NEW Advanced Charts -->
+        <section class="charts-row" id="chartsSection3">
+            <div class="chart-panel">
+                <div class="section-header">
+                    <h2>📉 AQI Distribution</h2>
+                    <span class="section-tag">Histogram</span>
+                </div>
+                <div class="chart-container chart-lg">
+                    <canvas id="aqiHistogram"></canvas>
+                </div>
+            </div>
+            <div class="chart-panel">
+                <div class="section-header">
+                    <h2>🔬 Pollutant Comparison by City</h2>
+                    <span class="section-tag">Grouped Bar</span>
+                </div>
+                <div class="chart-container chart-lg">
+                    <canvas id="pollutantGroupedBar"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Row 4 — Area Chart + Radar -->
+        <section class="charts-row" id="chartsSection4">
+            <div class="chart-panel">
+                <div class="section-header">
+                    <h2>🌊 AQI Trend Area</h2>
+                    <span class="section-tag">Area Chart</span>
+                </div>
+                <div class="chart-container chart-lg">
+                    <canvas id="aqiAreaChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-panel">
+                <div class="section-header">
+                    <h2>🕸️ City Environmental Profile</h2>
+                    <span class="section-tag">Radar Chart</span>
+                </div>
+                <div class="chart-container chart-lg">
+                    <canvas id="cityRadar"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alerts & AI Chat Row -->
+        <section class="bottom-row" id="alertSection">
+            <div class="alert-panel">
+                <div class="section-header">
+                    <h2>🚨 Anomaly Alerts</h2>
+                    <span class="section-tag" id="alertTotal">0 alerts</span>
+                </div>
+                <div class="alert-feed" id="alertFeed">
+                    <div class="loading-placeholder">No alerts yet</div>
+                </div>
+            </div>
+            <div class="chat-panel">
+                <div class="section-header">
+                    <h2>🤖 AI Environmental Advisor</h2>
+                    <span class="section-tag">RAG-Powered</span>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-msg bot">
+                        <div class="chat-avatar">AI</div>
+                        <div class="chat-bubble">
+                            Hello! I'm your GreenBharat AI advisor. Ask me about air quality standards, sustainability
+                            tips, or India's climate initiatives. 🌿
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Ask about air quality, sustainability..."
+                        autocomplete="off">
+                    <button id="chatSend" onclick="sendChat()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sustainability Panel -->
+        <section class="section sustainability-section" id="sustainSection">
+            <div class="section-header">
+                <h2>🌿 Sustainability Recommendations</h2>
+                <span class="section-tag">AI Insights</span>
+            </div>
+            <div class="sustainability-grid" id="sustainabilityGrid">
+                <div class="sustain-card">
+                    <div class="sustain-icon">🚲</div>
+                    <h3>Green Transport</h3>
+                    <p>30% of urban trips are under 2 km — perfect for cycling. Switch to EVs and save ₹40,000/year.</p>
+                    <div class="sustain-impact">Impact: <strong>-2,100 kg CO₂/year</strong></div>
+                </div>
+                <div class="sustain-card">
+                    <div class="sustain-icon">☀️</div>
+                    <h3>Solar Energy</h3>
+                    <p>PM Surya Ghar offers 40% subsidy for rooftop solar. Free electricity up to 300 units/month.</p>
+                    <div class="sustain-impact">Impact: <strong>-1,500 kg CO₂/year</strong></div>
+                </div>
+                <div class="sustain-card">
+                    <div class="sustain-icon">🌳</div>
+                    <h3>Urban Greening</h3>
+                    <p>Miyawaki forests are 30× denser than conventional plantations. Plant native trees: Neem, Peepal,
+                        Banyan.</p>
+                    <div class="sustain-impact">Impact: <strong>-22 kg CO₂/tree/year</strong></div>
+                </div>
+                <div class="sustain-card">
+                    <div class="sustain-icon">💧</div>
+                    <h3>Water Conservation</h3>
+                    <p>Rainwater harvesting saves ₹50,000/year. A dripping tap wastes 15,000 litres/year — fix leaks
+                        promptly.</p>
+                    <div class="sustain-impact">Impact: <strong>Save 50,000 L/year</strong></div>
+                </div>
+                <div class="sustain-card">
+                    <div class="sustain-icon">♻️</div>
+                    <h3>Waste Management</h3>
+                    <p>Segregate wet and dry waste for 80% recyclability. Compost kitchen waste to reduce methane from
+                        landfills.</p>
+                    <div class="sustain-impact">Impact: <strong>-300 kg CO₂/year</strong></div>
+                </div>
+                <div class="sustain-card">
+                    <div class="sustain-icon">💡</div>
+                    <h3>Energy Efficiency</h3>
+                    <p>LED bulbs use 75% less energy. 5-star BEE appliances save 30% power. Smart strips eliminate
+                        phantom loads.</p>
+                    <div class="sustain-impact">Impact: <strong>-500 kg CO₂/year</strong></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pathway Info Section -->
+        <section class="section pathway-section">
+            <div class="section-header">
+                <h2>⚡ Pathway Real-Time Architecture</h2>
+                <span class="section-tag">Live System</span>
+            </div>
+            <div class="pathway-flow">
+                <div class="flow-node">
+                    <div class="flow-icon">📡</div>
+                    <div class="flow-label">Data Simulator</div>
+                    <div class="flow-desc">8 cities, 4s interval</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node active">
+                    <div class="flow-icon">⚙️</div>
+                    <div class="flow-label">Pathway Engine</div>
+                    <div class="flow-desc">pw.io.csv.read()</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node">
+                    <div class="flow-icon">🧠</div>
+                    <div class="flow-label">Stream Processing</div>
+                    <div class="flow-desc">filter + reduce</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node">
+                    <div class="flow-icon">📊</div>
+                    <div class="flow-label">Live Dashboard</div>
+                    <div class="flow-desc">Auto-refreshing UI</div>
+                </div>
+            </div>
+            <div class="pathway-flow" style="margin-top:14px">
+                <div class="flow-node">
+                    <div class="flow-icon">📄</div>
+                    <div class="flow-label">Knowledge Docs</div>
+                    <div class="flow-desc">3 MD files</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node active">
+                    <div class="flow-icon">🔍</div>
+                    <div class="flow-label">DocumentStore</div>
+                    <div class="flow-desc">Live RAG Index</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node">
+                    <div class="flow-icon">🤖</div>
+                    <div class="flow-label">AI Advisor</div>
+                    <div class="flow-desc">Q&A Chat</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node">
+                    <div class="flow-icon">💬</div>
+                    <div class="flow-label">User Query</div>
+                    <div class="flow-desc">Real-time answers</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="footer-content">
+                <span>GreenBharat AI — Hack For Green Bharat 2026 🇮🇳</span>
+                <span>Powered by <strong>Pathway</strong> Real-Time Framework</span>
+                <span>Sustainability + Climate + AI/ML</span>
+            </div>
+        </footer>
+    </main>
+
+    <script src="/frontend/app.js"></script>
+</body>
+
+</html>
